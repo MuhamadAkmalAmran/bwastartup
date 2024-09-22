@@ -1,9 +1,11 @@
 package main
 
 import (
+	"be-bwa-startup/auth"
 	"be-bwa-startup/handler"
 	"be-bwa-startup/user"
 	"log"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -19,10 +21,9 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
+	authService := auth.NewService()
 
-	userService.SaveAvatar(1, "images/avatar.png")
-
-	userHandler := handler.NewUserHandler(userService)
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
 
@@ -34,6 +35,5 @@ func main() {
 	api.POST("/avatars", userHandler.UploadAvatar)
 
 	router.Run()
-
 
 }
