@@ -12,6 +12,7 @@ type Service interface {
 	GetCampaignByID(input GetCampaignDetailInput) (Campaign, error)
 	CreateCampaign(input CreateCampaignInput) (Campaign, error)
 	UpdateCampaign(ID GetCampaignDetailInput, input CreateCampaignInput) (Campaign, error)
+	SaveCampaignImages(input CreateCampaignImageInput, fileLocation string) (CampaignImage, error)
 }
 
 type service struct {
@@ -62,14 +63,12 @@ func (s *service) CreateCampaign(input CreateCampaignInput) (Campaign, error) {
 	slugCandidate := fmt.Sprintf("%s %d", input.Name, input.User.ID)
 	campaign.Slug = slug.Make(slugCandidate)
 
-	// pembuatan slug
-
 	newCampaign, err := s.repository.Save(campaign)
 
 	if err != nil {
 		return newCampaign, err
 	}
-	return campaign, nil
+	return newCampaign, nil
 }
 func (s *service) UpdateCampaign(InputId GetCampaignDetailInput, input CreateCampaignInput) (Campaign, error) {
 	campaign, err := s.repository.FindById(InputId.ID)
@@ -78,7 +77,7 @@ func (s *service) UpdateCampaign(InputId GetCampaignDetailInput, input CreateCam
 		return campaign, err
 	}
 
-	if campaign.ID != input.User.ID {
+	if campaign.User.ID != input.User.ID {
 		return campaign, errors.New("not an owner of the campaign")
 	}
 	campaign.Name = input.Name
@@ -95,4 +94,41 @@ func (s *service) UpdateCampaign(InputId GetCampaignDetailInput, input CreateCam
 
 	return updatedCampaign, nil
 
+}
+
+func (s *service) SaveCampaignImages(input CreateCampaignImageInput, fileLocation string) (CampaignImage, error) {
+	campaign, err := s.repository.FindById(input.CampaignID)
+
+	if err != nil {
+		return CampaignImage{}, err
+	}
+
+	if campaign.User.ID != input.User.ID {
+		return CampaignImage{}, errors.New("not an owner of the campaign")
+	}
+
+	isPrimary := 0
+	if input.IsPrimary {
+		isPrimary = 1
+
+		_, err := s.repository.MarkAllCampaignImagesAsNonPrimary(input.CampaignID)
+
+		if err != nil {
+			return CampaignImage{}, err
+		}
+	}
+
+	campaignImage := CampaignImage{}
+
+	campaignImage.CampaignID = input.CampaignID
+	campaignImage.IsPrimary = isPrimary
+	campaignImage.FileName = fileLocation
+
+	newCampaignImage, err := s.repository.CreateImage(campaignImage)
+
+	if err != nil {
+		return newCampaignImage, err
+	}
+
+	return newCampaignImage, nil
 }

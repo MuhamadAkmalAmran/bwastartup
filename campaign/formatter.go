@@ -13,33 +13,32 @@ type CampaignFormatter struct {
 	ImageUrl         string `json:"image_url"`
 	GoalAmount       int    `json:"goal_amount"`
 	CurrentAmount    int    `json:"current_amount"`
-	Slug string `json:"slug"`
+	Slug             string `json:"slug"`
 }
 
 type CampaignDetailFormatter struct {
-	ID int `json:"id"`
-	Name string `json:"name"`
-	ShortDescription string `json:"short_description"`
-	Description string `json:"description"`
-	ImageUrl string `json:"image_url"`
-	GoalAmount int `json:"goal_amount"`
-	CurrentAmount int `json:"current_amount"`
-	UserID int `json:"user_id"`
-	Slug string `json:"slug"`
-	Perks []string `json:"perks"`
-	User CampaignUserFormatter `json:"user"`
-	Images []CampaignImageUrlFormatter `json:"images"`
-
+	ID               int                         `json:"id"`
+	Name             string                      `json:"name"`
+	ShortDescription string                      `json:"short_description"`
+	Description      string                      `json:"description"`
+	ImageUrl         string                      `json:"image_url"`
+	GoalAmount       int                         `json:"goal_amount"`
+	CurrentAmount    int                         `json:"current_amount"`
+	UserID           int                         `json:"user_id"`
+	Slug             string                      `json:"slug"`
+	Perks            []string                    `json:"perks"`
+	User             CampaignUserFormatter       `json:"user"`
+	Images           []CampaignImageUrlFormatter `json:"images"`
 }
 
 type CampaignUserFormatter struct {
-	Name string `json:"name"`
+	Name     string `json:"name"`
 	ImageUrl string `json:"image_url"`
 }
 
 type CampaignImageUrlFormatter struct {
-	ImageUrl string `json:"image_url"`
-	IsPrimary bool `json:"is_primary"`
+	ImageUrl  string `json:"image_url"`
+	IsPrimary bool   `json:"is_primary"`
 }
 
 func FormatCampaign(campaign Campaign) CampaignFormatter {
@@ -55,14 +54,13 @@ func FormatCampaign(campaign Campaign) CampaignFormatter {
 
 	if len(campaign.CampaignImages) > 0 {
 		campaignFormatter.ImageUrl = campaign.CampaignImages[0].FileName
-		fmt.Println(campaignFormatter.ImageUrl)
 	}
 
 	return campaignFormatter
 }
 
 func FormatCampaigns(campaigns []Campaign) []CampaignFormatter {
-	 campaignsFormatter := []CampaignFormatter{}
+	campaignsFormatter := []CampaignFormatter{}
 
 	for _, campaign := range campaigns {
 		campaignFormatter := FormatCampaign(campaign)
@@ -120,9 +118,7 @@ func FormatCampaignDetail(campaign Campaign) CampaignDetailFormatter {
 		images = append(images, campaignImageFormatter)
 	}
 
-	campaignDetailFormatter.Images = images 
-
-
+	campaignDetailFormatter.Images = images
 
 	return campaignDetailFormatter
 }
