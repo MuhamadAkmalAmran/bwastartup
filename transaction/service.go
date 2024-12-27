@@ -5,14 +5,16 @@ import (
 	"errors"
 )
 
+type Service interface {
+	GetTransactionByCampaignID(input GetCampaignTransactionsInput) ([]Transaction, error)
+	GetTransactionsByUserID(userID int)([]Transaction, error)
+}
+
 type service struct {
 	repository         Repository
 	campaignRepository campaign.Repository
 }
 
-type Service interface {
-	GetTransactionByCampaignID(input GetCampaignTransactionsInput) ([]Transaction, error)
-}
 
 func NewService(repository Repository, campainRepository campaign.Repository) *service {
 	return &service{repository, campainRepository}
@@ -36,4 +38,14 @@ func (s *service) GetTransactionByCampaignID(input GetCampaignTransactionsInput)
 		return transaction, err
 	}
 	return transaction, nil
+}
+
+func(s *service) GetTransactionsByUserID(userID int)([]Transaction, error) {
+	transactions, err := s.repository.GetByUserID(userID)
+
+	if err != nil {
+		return transactions, err
+	}
+
+	return transactions, nil
 }
